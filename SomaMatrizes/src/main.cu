@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<cuda.h>
+#include "lib.c"
 
 
 #define MAX 10
@@ -7,21 +8,6 @@
 void teste(){
 	printf("hello world!");
 }
-
-void populaVetor(int * x, int tamanho){
-	int i;
-	for(i = 0; i < tamanho; i++){
-		x[i] = rand() % tamanho;
-	}
-}
-
-void exibeVetor(int * x, int tamanho){
-	int i;
-	for(i = 0; i < tamanho; i++){
-		printf("%d : %d\n", i, x[i]);
-	}
-}
-
 
 __global__ void kernelSoma(int * J, int * K, int * L, int tamanho){
 	int indice = blockDim.x * blockIdx.x + threadIdx.x;

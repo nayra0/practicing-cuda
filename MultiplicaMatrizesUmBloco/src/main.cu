@@ -2,16 +2,16 @@
 #include<cuda.h>
 #include "lib.c"
 
-__global__ void kernelMulti(int * a, int * b, int * c, int tamanho){
+__global__ void kernelMulti(int * a, int * b, int * c, int tamanho, int dimA, int dimB, int dimX){
 	int tx = threadIdx.x;
 	int ty = threadIdx.y;
 	int value = 0;
-	int indice = tx * blockDim.x + ty;
+	int indice = tx * blockDim.y + ty;
 
 	if(indice <= tamanho){
-		for(int i = 0; i< blockDim.x; i++){
-			int x = a[tx * blockDim.x + i] ;
-			int y = b[i * blockDim.x + ty] ;
+		for(int i = 0; i< dimX; i++){
+			int x = a[tx * dimA + i] ;
+			int y = b[i * dimB + ty] ;
 			value += x * y;
 		}
 		c[indice] = value;
@@ -19,7 +19,8 @@ __global__ void kernelMulti(int * a, int * b, int * c, int tamanho){
 }
 
 int main(){
-	dim3 a(2,3),b(3,4),c;
+	int dimComum = 3;
+	dim3 a(2,dimComum),b(dimComum,4),c;
 	c.x = a.x;
 	c.y = b.y;
 
@@ -54,7 +55,7 @@ int main(){
 	cudaMemcpy(d_b,h_b,tamB,cudaMemcpyHostToDevice);
 
 	dim3 grid(1,1,1), block(c.x,c.y,1);
-	kernelMulti<<<grid, block>>>(d_a, d_b, d_c, t_c);
+	kernelMulti<<<grid, block>>>(d_a, d_b, d_c, t_c, a.y, b.y, dimComum);
 
 	cudaMemcpy(h_c,d_c, tamC, cudaMemcpyDeviceToHost);
 

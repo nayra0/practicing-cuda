@@ -111,4 +111,5 @@ src/main.o : ../src/main.cu \
     /usr/local/cuda-7.5/bin/..//include/surface_indirect_functions.h \
     /usr/local/cuda-7.5/bin/..//include/surface_indirect_functions.hpp \
     /usr/local/cuda-7.5/bin/..//include/device_launch_parameters.h \
-    /usr/local/cuda-7.5/bin/..//include/cuda.h
+    /usr/local/cuda-7.5/bin/..//include/cuda.h \
+    ../src/lib.h
