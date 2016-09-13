@@ -2,16 +2,26 @@
 #include<cuda.h>
 #include "lib.c"
 
+/**
+ * Para essa implementação tem que ser verdade que grid.x > grid.y e block.y > block.x
+ */
 __global__ void kernelMulti(int * a, int * b, int * c, int tamanho, int dimA, int dimB, int dimX){
 	int tx = threadIdx.x;
 	int ty = threadIdx.y;
+	int bx = blockIdx.x;
+	int by = blockIdx.y;
+
+	int row = bx * blockDim.x + tx;
+	int col = by * blockDim.y + ty;
+
 	int value = 0;
-	int indice = tx * blockDim.y + ty;
+	int indice = gridDim.y * blockDim.y * row +col;
 
 	if(indice <= tamanho){
+
 		for(int i = 0; i< dimX; i++){
-			int x = a[tx * dimA + i] ;
-			int y = b[i * dimB + ty] ;
+			int x = a[row * dimA + i] ;
+			int y = b[i * dimB + col] ;
 			value += x * y;
 		}
 		c[indice] = value;
@@ -20,7 +30,7 @@ __global__ void kernelMulti(int * a, int * b, int * c, int tamanho, int dimA, in
 
 int main(){
 	int dimComum = 3;
-	dim3 a(2,dimComum),b(dimComum,4),c;
+	dim3 a(4,dimComum),b(dimComum,3),c;
 	c.x = a.x;
 	c.y = b.y;
 
@@ -54,7 +64,7 @@ int main(){
 	cudaMemcpy(d_a,h_a,tamA,cudaMemcpyHostToDevice);
 	cudaMemcpy(d_b,h_b,tamB,cudaMemcpyHostToDevice);
 
-	dim3 grid(1,1,1), block(c.x,c.y,1);
+	dim3 grid(2,1,1), block(2,3,1);
 	kernelMulti<<<grid, block>>>(d_a, d_b, d_c, t_c, a.y, b.y, dimComum);
 
 	cudaMemcpy(h_c,d_c, tamC, cudaMemcpyDeviceToHost);
